@@ -144,6 +144,9 @@ namespace Matsumoto.Character {
 			_bodyWithBone.material = _bodyMaterial;
 			_bodyMaterial.EnableKeyword("_EMISSION");
 
+			var effect = _body.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+			effect.startColor = StarStatus.BodyColor;
+
 			_playerRenderers = GetComponentsInChildren<Renderer>();
 
 			_currentStatus = ScriptableObject.CreateInstance<PlayerStatus>();
@@ -653,6 +656,9 @@ namespace Matsumoto.Character {
 			if(enemy == null) return;
 
 			var g = Instantiate(HitEffectPrefab, transform.position, transform.rotation);
+			var effect = g.transform.GetChild(2).GetComponent<ParticleSystem>().main;
+			effect.startColor = StarStatus.BodyColor;
+
 			Destroy(g.gameObject, 5);
 
 			enemy.ApplyDamage();
@@ -680,6 +686,11 @@ namespace Matsumoto.Character {
 			// 死亡演出
 			IsRenderer = false;
 			var p = Instantiate(DeathEffectPrefab, transform.position, transform.rotation);
+
+			foreach(var item in p.transform.GetComponentsInChildren<ParticleSystem>()) {
+				var effect = item.main;
+				effect.startColor = StarStatus.BodyColor;
+			}
 			Destroy(p, 5.0f);
 
 			AudioManager.PlaySE("Death", position: transform.position);

@@ -5,7 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Enemyインタフェース
 /// </summary>
-public interface IEnemy
+public interface IEnemy : IDamageable
 {
     /// <summary>
     /// 移動処理
@@ -16,9 +16,4 @@ public interface IEnemy
     /// Enemyごとのアクション(攻撃処理など)
     /// </summary>
     void Action();
-
-    /// <summary>
-    /// ダメージ処理
-    /// </summary>
-    void ApplyDamage();
 }

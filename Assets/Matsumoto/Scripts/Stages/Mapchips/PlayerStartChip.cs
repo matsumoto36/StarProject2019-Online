@@ -7,12 +7,15 @@ namespace Matsumoto.Gimmick {
 
 	public class PlayerStartChip : GimmickChip {
 
+		public string TargetPlayerName = "Player";
+
 		public override void GimmickStart() {
 
-			var player = FindObjectOfType<Player>();
+			var player = transform
+				.Find(TargetPlayerName)
+				.GetComponent<Player>();
+
 			player.transform.position = transform.position;
-			var cam = FindObjectOfType<PlayerCamera>();
-			cam.SetTarget(player);
 
 			Destroy(gameObject);
 		}

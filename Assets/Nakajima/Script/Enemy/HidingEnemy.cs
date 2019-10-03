@@ -124,7 +124,7 @@ public class HidingEnemy : EnemyBase, IEnemy
     /// <summary>
     /// ダメージを受けた際の処理
     /// </summary>
-    public void ApplyDamage()
+    public void ApplyDamage(GameObject damager, DamageType type, float power = 1.0f)
     {
         // 攻撃を受けたら消滅
         Destroy(gameObject);

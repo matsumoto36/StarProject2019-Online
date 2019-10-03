@@ -10,21 +10,14 @@ using Matsumoto.Audio;
 using Matsumoto.Character;
 using Matsumoto;
 
-public enum GameState {
-	StartUp,
-	Playing,
-	GameClear,
-	GameOver,
-}
-
-public class StageController : MonoBehaviour {
+public class BattleStageController : MonoBehaviour, IStageController {
 
 	public const string StageFollowerDataTarget = "_FollowerData";
 	public const string HalfwayPointKey = "HalfWay";
 
-	public event Action<StageController> OnGameStart;
-	public event Action<StageController> OnGameClear;
-	public event Action<StageController> OnGameOver;
+	public event Action<IStageController> OnGameStart;
+	public event Action<IStageController> OnGameClear;
+	public event Action<IStageController> OnGameOver;
 
 	public PlayerFollower PlayerFollowerPrefab;
 	public PauseMenu PauseMenuCanvas;
@@ -32,7 +25,6 @@ public class StageController : MonoBehaviour {
 	public bool IsCreateStage = true;
 	public bool IsOverride = false;
 	public bool IsReturnToSelect = true;
-	public bool CanPause = false;
 
 	public string StagePath = "TestStage";
 	private string _followerDataKey;
@@ -40,6 +32,10 @@ public class StageController : MonoBehaviour {
 
 	// 救出している最中のもの
 	private HalfPointData _halfPointData = new HalfPointData();
+
+	public bool CanPause {
+		get; set;
+	} = false;
 
 	public GameState State {
 		get; private set;
@@ -75,9 +71,9 @@ public class StageController : MonoBehaviour {
 		// 中間地点のデータ読み込み
 		var player = FindObjectOfType<Player>();
 		var delayAct = new Action(() => { });
-		if (GameData.Instance.GetData(HalfwayPointKey, ref _halfPointData)) {
+		if(GameData.Instance.GetData(HalfwayPointKey, ref _halfPointData)) {
 
-			 delayAct = () => {
+			delayAct = () => {
 				player.transform.position = _halfPointData.PlayerPosition;
 				FindObjectOfType<PlayerCamera>().SetTarget(player);
 			};
@@ -104,21 +100,26 @@ public class StageController : MonoBehaviour {
 		PauseMenuCanvas.SetStageController(this);
 		PauseMenuCanvas.gameObject.SetActive(false);
 
+		// プレイヤーが死亡したらゲームオーバー
+		FindObjectOfType<Player>().OnDeath += (_) => {
+			GameOver();
+		};
+
 	}
 
 	// Use this for initialization
-	void Start () {
+	void Start() {
 
 		// BGMを鳴らす
 		AudioManager.FadeIn(1.0f, "Comet_Highway");
 
 		GameStart();
 	}
-	
-	// Update is called once per frame
-	void Update () {
 
-		if (Input.GetButtonDown("Menu") && CanPause) {
+	// Update is called once per frame
+	void Update() {
+
+		if(Input.GetButtonDown("Menu") && CanPause) {
 			PauseSystem.Instance.IsPause = !PauseSystem.Instance.IsPause;
 			PauseMenuCanvas.gameObject.SetActive(!PauseMenuCanvas.gameObject.activeSelf);
 		}
@@ -142,7 +143,7 @@ public class StageController : MonoBehaviour {
 		CanPause = true;
 	}
 
-	public void GameClear() {
+	public virtual void GameClear() {
 
 		Debug.Log("GameClear!");
 
@@ -171,7 +172,7 @@ public class StageController : MonoBehaviour {
 		}
 	}
 
-	public void GameOver() {
+	public virtual void GameOver() {
 
 		Debug.Log("GameOver!");
 		State = GameState.GameOver;
@@ -201,26 +202,4 @@ public class StageController : MonoBehaviour {
 		_halfPointData.PlayerPosition = position;
 		GameData.Instance.SetData(HalfwayPointKey, _halfPointData);
 	}
-}
-
-namespace Matsumoto {
-
-	[Serializable]
-	public class HalfPointData {
-		public float PlayerPositionX;
-		public float PlayerPositionY;
-		public float PlayerPositionZ;
-
-		public Vector3 PlayerPosition {
-			get { return new Vector3(PlayerPositionX, PlayerPositionY, PlayerPositionZ); }
-			set {
-				PlayerPositionX	= value.x;
-				PlayerPositionY	= value.y;
-				PlayerPositionZ = value.z;
-			}
-		}
-
-		public FollowerFindData FollowerData = new FollowerFindData();
-	}
-
 }

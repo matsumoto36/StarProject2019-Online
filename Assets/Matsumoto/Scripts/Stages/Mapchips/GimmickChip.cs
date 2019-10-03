@@ -6,7 +6,7 @@ namespace Matsumoto.Gimmick {
 
 	public class GimmickChip : MonoBehaviour {
 
-		public StageController Controller {
+		public IStageController Controller {
 			get; set;
 		}
 

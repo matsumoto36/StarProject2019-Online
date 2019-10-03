@@ -16,6 +16,7 @@ namespace Matsumoto.Gimmick {
 		public float Amplitude = 0.1f;
 		public float Speed = 2.0f;
 
+		private DefaultStageController _defaultController;
 		private string _dataKey;
 		private float _randomTime;
 		private float _startY;
@@ -23,12 +24,15 @@ namespace Matsumoto.Gimmick {
 		public override void GimmickStart() {
 			base.GimmickStart();
 
+			_defaultController = Controller as DefaultStageController;
+			if(!_defaultController) return;
+
 			Debug.Log("_" + FollowerIndex);
-			foreach(var item in Controller.FollowerData.FindedIndexList) {
+			foreach(var item in _defaultController.FollowerData.FindedIndexList) {
 				Debug.Log(item);
 			}
 
-			if(Controller.FollowerData.FindedIndexList
+			if(_defaultController.FollowerData.FindedIndexList
 				.Exists(x => x == FollowerIndex)) {
 				Destroy(gameObject);
 			}
@@ -57,20 +61,21 @@ namespace Matsumoto.Gimmick {
 		}
 
 		private void OnTriggerEnter2D(Collider2D collision) {
+
+			if(!_defaultController) return;
 			var player = collision.GetComponent<Player>();
-			if(player) {
+			if(!player) return;
 
-				var follower = Instantiate(PlayerFollowerPrefab, transform.position, transform.rotation);
-				follower.Target = player;
+			var follower = Instantiate(PlayerFollowerPrefab, transform.position, transform.rotation);
+			follower.Target = player;
 
-				Controller.AddFollowerData(FollowerIndex);
+			_defaultController.AddFollowerData(FollowerIndex);
 
-				AudioManager.PlaySE("GetFollower", position: transform.position);
+			AudioManager.PlaySE("GetFollower", position: transform.position);
 
-				var g = Instantiate(GetFollowerEffectPrefab, transform.position, transform.rotation);
-				Destroy(g, 5.0f);
-				Destroy(gameObject);
-			}
+			var g = Instantiate(GetFollowerEffectPrefab, transform.position, transform.rotation);
+			Destroy(g, 5.0f);
+			Destroy(gameObject);
 		}
 	}
 }

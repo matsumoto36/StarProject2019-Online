@@ -44,7 +44,6 @@ namespace Matsumoto.Character {
 		public GameObject HitEffectPrefab;
 		public GameObject DeathEffectPrefab;
 
-		private StageController _stageController;
 		private Animator _animator;
 		private Transform _eye;
 		private SpriteRenderer _body;
@@ -64,6 +63,7 @@ namespace Matsumoto.Character {
 		private float _jumpWait = 0;
 
 		public event Action<PlayerState, PlayerState> OnStateChanged;
+		public event Action<Player> OnDeath;
 		public event Action<bool> OnIsDashChanged;
 
 		public float RollSpeed {
@@ -132,7 +132,6 @@ namespace Matsumoto.Character {
 
 			AttackCollider.enabled = false;
 
-			_stageController = FindObjectOfType<StageController>();
 			_animator = GetComponent<Animator>();
 			PlayerRig = GetComponent<Rigidbody2D>();
 			_eye = transform.Find("Eye");
@@ -153,7 +152,7 @@ namespace Matsumoto.Character {
 			_currentStatus.Material = new PhysicsMaterial2D("CurrentMat");
 
 			// イベント
-			var controller = FindObjectOfType<StageController>();
+			var controller = this.FindObjectOfInterface<IStageController>();
 			controller.OnGameStart += (c) => {
 				IsFreeze = false;
 			};
@@ -652,8 +651,8 @@ namespace Matsumoto.Character {
 
 			if(!IsAttacking) return;
 
-			var enemy = collision.gameObject.GetComponent<IEnemy>();
-			if(enemy == null) return;
+			var damageable = collision.gameObject.GetComponent<IDamageable>();
+			if(damageable == null) return;
 
 			var g = Instantiate(HitEffectPrefab, transform.position, transform.rotation);
 			var effect = g.transform.GetChild(2).GetComponent<ParticleSystem>().main;
@@ -661,7 +660,7 @@ namespace Matsumoto.Character {
 
 			Destroy(g.gameObject, 5);
 
-			enemy.ApplyDamage();
+			damageable.ApplyDamage(gameObject, DamageType.Enemy);
 
 			// 敵にあたったら回復
 			_canAttack = true;
@@ -695,8 +694,8 @@ namespace Matsumoto.Character {
 
 			AudioManager.PlaySE("Death", position: transform.position);
 
-			_stageController.GameOver();
-
+			// 死亡通知
+			OnDeath?.Invoke(this);
 		}
 	}
 }

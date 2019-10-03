@@ -21,7 +21,7 @@ public class PauseMenu : MonoBehaviour
     public MenuState menuState;
 
     // StageControllerのインスタンス
-    private StageController stageCon;
+    private IStageController stageCon;
 
     // 項目の位置
     [SerializeField, Header("メニューの項目")]
@@ -80,7 +80,7 @@ public class PauseMenu : MonoBehaviour
     /// StageControllerのセットアップ
     /// </summary>
     /// <param name="_stageCon">StageControllerのインスタンス</param>
-    public void SetStageController(StageController _stageCon)
+    public void SetStageController(IStageController _stageCon)
     {
         stageCon = _stageCon;
         VolumeInitialize();

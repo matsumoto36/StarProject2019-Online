@@ -89,7 +89,7 @@ public class StageNode : MonoBehaviour {
 
 		// 助けた数を表示
 		FollowerFindData followerData = new FollowerFindData();
-		GameData.Instance.GetData(TargetStageName + StageController.StageFollowerDataTarget, ref followerData);
+		GameData.Instance.GetData(TargetStageName + DefaultStageController.StageFollowerDataTarget, ref followerData);
 		var count = followerData.FindedIndexList.Count;
 		followerCount += count;
 		for (int i = 0; i < FindedFollowerPositions.Count; i++) {

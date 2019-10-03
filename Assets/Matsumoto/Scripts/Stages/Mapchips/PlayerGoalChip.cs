@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Matsumoto.Character;
+using System;
 
 namespace Matsumoto.Gimmick {
 
@@ -10,6 +11,8 @@ namespace Matsumoto.Gimmick {
 		public Transform ToPlayerAnchor;
 		public SpriteMask MaskSprite;
 		public SpriteRenderer[] GateRenderers;
+
+		public event Action<Player> OnGoalPlayer;
 
 		private Animator _gateAnimator;
 		private Material _gateMaterial;
@@ -52,8 +55,6 @@ namespace Matsumoto.Gimmick {
 			// プレイヤーを止める
 			player.Stop();
 
-
-
 			// スピードを設定して開けさせる
 			_gateAnimator.SetFloat("DoorSpeed", 1.0f);
 
@@ -76,7 +77,7 @@ namespace Matsumoto.Gimmick {
 			pos.y = 0.0f;
 			yield return StartCoroutine(player.MoveTo(pos));
 
-			Controller.GameClear();
+			OnGoalPlayer?.Invoke(player);
 		}
 
 	}

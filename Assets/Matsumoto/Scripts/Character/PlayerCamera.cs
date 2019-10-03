@@ -25,7 +25,8 @@ namespace Matsumoto.Character {
 
 		// Use this for initialization
 		void Start() {
-			var controller = FindObjectOfType<StageController>();
+			var controller = this.FindObjectOfInterface<IStageController>();
+			controller.OnGameStart += (c) => SetTarget(TargetPlayer);
 			controller.OnGameClear += (c) => IsFreeze = true;
 			controller.OnGameOver += (c) => IsFreeze = true;
 		}

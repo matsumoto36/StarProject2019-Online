@@ -12,26 +12,16 @@ using Matsumoto;
 
 public class BattleStageController : MonoBehaviour, IStageController {
 
-	public const string StageFollowerDataTarget = "_FollowerData";
-	public const string HalfwayPointKey = "HalfWay";
-
 	public event Action<IStageController> OnGameStart;
 	public event Action<IStageController> OnGameClear;
 	public event Action<IStageController> OnGameOver;
-
-	public PlayerFollower PlayerFollowerPrefab;
-	public PauseMenu PauseMenuCanvas;
 
 	public bool IsCreateStage = true;
 	public bool IsOverride = false;
 	public bool IsReturnToSelect = true;
 
 	public string StagePath = "TestStage";
-	private string _followerDataKey;
 	private List<GimmickChip> _gimmicks = new List<GimmickChip>();
-
-	// 救出している最中のもの
-	private HalfPointData _halfPointData = new HalfPointData();
 
 	public bool CanPause {
 		get; set;
@@ -41,12 +31,6 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		get; private set;
 	} = GameState.StartUp;
 
-	// すでに救出したもの
-	private FollowerFindData _followerData = new FollowerFindData();
-	public FollowerFindData FollowerData {
-		get { return _followerData; }
-	}
-
 	private void Awake() {
 
 		if(!IsOverride)
@@ -55,39 +39,6 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		// ステージ生成
 		CreateStage(StagePath);
 
-		var followerChipIndex = FindObjectsOfType<FollowPlayerChip>()
-			.Select(item => item.FollowerIndex)
-			.ToArray();
-
-		// フォロワーのデータ取得
-		_followerDataKey = StagePath + StageFollowerDataTarget;
-		GameData.Instance.GetData(_followerDataKey, ref _followerData);
-
-		// ステージにないデータを削除
-		_followerData.FindedIndexList = _followerData.FindedIndexList
-			.Where(data => Array.Exists(followerChipIndex, x => x == data))
-			.ToList();
-
-		// 中間地点のデータ読み込み
-		var player = FindObjectOfType<Player>();
-		var delayAct = new Action(() => { });
-		if(GameData.Instance.GetData(HalfwayPointKey, ref _halfPointData)) {
-
-			delayAct = () => {
-				player.transform.position = _halfPointData.PlayerPosition;
-				FindObjectOfType<PlayerCamera>().SetTarget(player);
-			};
-
-			// 生成
-			foreach(var item in _halfPointData.FollowerData.FindedIndexList) {
-				var f = Instantiate(PlayerFollowerPrefab, _halfPointData.PlayerPosition, Quaternion.identity);
-				f.Target = player;
-			}
-
-			// データを統合して取得したことにする
-			_followerData.FindedIndexList.AddRange(_halfPointData.FollowerData.FindedIndexList);
-		}
-
 		// ギミック
 		_gimmicks = FindObjectsOfType<GimmickChip>().ToList();
 		foreach(var item in _gimmicks) {
@@ -95,15 +46,13 @@ public class BattleStageController : MonoBehaviour, IStageController {
 			item.GimmickStart();
 		}
 
-		delayAct();
-
-		PauseMenuCanvas.SetStageController(this);
-		PauseMenuCanvas.gameObject.SetActive(false);
+		//PauseMenuCanvas.SetStageController(this);
+		//PauseMenuCanvas.gameObject.SetActive(false);
 
 		// プレイヤーが死亡したらゲームオーバー
-		FindObjectOfType<Player>().OnDeath += (_) => {
-			GameOver();
-		};
+		//FindObjectOfType<Player>().OnDeath += (_) => {
+		//	GameOver();
+		//};
 
 	}
 
@@ -119,10 +68,10 @@ public class BattleStageController : MonoBehaviour, IStageController {
 	// Update is called once per frame
 	void Update() {
 
-		if(Input.GetButtonDown("Menu") && CanPause) {
-			PauseSystem.Instance.IsPause = !PauseSystem.Instance.IsPause;
-			PauseMenuCanvas.gameObject.SetActive(!PauseMenuCanvas.gameObject.activeSelf);
-		}
+		//if(Input.GetButtonDown("Menu") && CanPause) {
+		//	PauseSystem.Instance.IsPause = !PauseSystem.Instance.IsPause;
+		//	PauseMenuCanvas.gameObject.SetActive(!PauseMenuCanvas.gameObject.activeSelf);
+		//}
 
 	}
 
@@ -148,12 +97,6 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		Debug.Log("GameClear!");
 
 		State = GameState.GameClear;
-
-		// 中間データを削除
-		GameData.Instance.DeleteData(HalfwayPointKey);
-
-		// フォロワーとクリアデータを保存
-		GameData.Instance.SetData(_followerDataKey, _followerData);
 
 		var clearedStages = new HashSet<string>();
 		GameData.Instance.GetData(StageSelectController.StageProgressKey, ref clearedStages);
@@ -191,15 +134,5 @@ public class BattleStageController : MonoBehaviour, IStageController {
 
 		var sceneName = SceneManager.GetActiveScene().name;
 		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade);
-	}
-
-	public void AddFollowerData(int index) {
-		_followerData.FindedIndexList.Add(index);
-		_halfPointData.FollowerData.FindedIndexList.Add(index);
-	}
-
-	public void SetHalfPoint(Vector3 position) {
-		_halfPointData.PlayerPosition = position;
-		GameData.Instance.SetData(HalfwayPointKey, _halfPointData);
 	}
 }

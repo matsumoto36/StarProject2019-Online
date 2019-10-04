@@ -5,9 +5,8 @@ using System;
 
 public class StageNode : MonoBehaviour {
 
-	private const string StageBasePath = "Stages/";
-
 	public string TargetStageName;
+	public string MoveSceneName;
 
 	public GameObject FollowerModelPrefab;
 	public GameObject FollowerChipPrefab;
@@ -142,6 +141,10 @@ public class StageNode : MonoBehaviour {
 	//		_labRenderer.sortingOrder = 0;
 	//	}
 	//}
+
+	public bool MoveScene() {
+		return SceneChanger.Instance.MoveScene(MoveSceneName, 1.0f, 1.0f, SceneChangeType.StarBlackFade);
+	}
 
 	public void OnDrawGizmos() {
 		if(!NextStage) return;

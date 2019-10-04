@@ -14,9 +14,10 @@ public class StageSelectController : MonoBehaviour {
 	public const string LoadSceneKey = "LoadScene";
 	public const string StageProgressKey = "StageProgress";
 
-	private static int _lastSelectedStageIndex;
+	private static int _lastSelectedStageIndex = -1;
 
 	public StageNode FirstNode;
+	public StageNode TitleNode;
 	public Transform PlayerModel;
 
 	public float MoveSpeed;
@@ -61,11 +62,18 @@ public class StageSelectController : MonoBehaviour {
 
 		var stageProgress = clearedStages.Count;
 		var followerCount = 0;
-		// ステージノードのセットアップ(+1はタイトル分)
-		FirstNode.SetUpNode(null, stageProgress + 1, ref followerCount);
+
+		var titleNodeIndex = GetStageIndex(TitleNode);
+
+		if(_lastSelectedStageIndex == -1) {
+			_lastSelectedStageIndex = titleNodeIndex;
+		}
+
+		// ステージノードのセットアップ(+1はタイトル)
+		FirstNode.SetUpNode(null, titleNodeIndex + stageProgress + 1, ref followerCount);
 
 		_targetStage = _currentSelectedStage = GetStageNode(_lastSelectedStageIndex);
-		if(_currentSelectedStage != FirstNode) State = StageSelectState.Select;
+		if(_currentSelectedStage != TitleNode) State = StageSelectState.Select;
 
 		_playerPositionTarget = GetLength(_targetStage);
 
@@ -94,7 +102,7 @@ public class StageSelectController : MonoBehaviour {
 		if(IsFreeze) return;
 
 		if(Input.GetButtonDown("Attack")) {
-			if(_targetStage != FirstNode && State != StageSelectState.Title)
+			if(State != StageSelectState.Title)
 
 				MoveScene();
 		}
@@ -114,7 +122,7 @@ public class StageSelectController : MonoBehaviour {
 
 		if(Input.GetKeyDown(KeyCode.P) && !_isSceneMoving) {
 			_isSceneMoving = true;
-			_lastSelectedStageIndex = 0;
+			_lastSelectedStageIndex = GetStageIndex(TitleNode);
 			GameData.Instance.DeleteDataAll();
 			GameData.Instance.Save();
 			SceneChanger.Instance.MoveScene("StageSelect", 0.2f, 0.2f, SceneChangeType.BlackFade);
@@ -123,6 +131,7 @@ public class StageSelectController : MonoBehaviour {
 		if(p == Position) {
 			_currentSelectedStage = _targetStage;
 			_currentSelectedStage.IsSelected = true;
+			State = _currentSelectedStage == TitleNode ? StageSelectState.Title : StageSelectState.Select;
 		}
 		else {
 			if(_currentSelectedStage)
@@ -146,7 +155,7 @@ public class StageSelectController : MonoBehaviour {
 
 		_lastSelectedStageIndex = GetStageIndex(_currentSelectedStage);
 		GameData.Instance.SetData(LoadSceneKey, _currentSelectedStage.TargetStageName);
-		_isSceneMoving = SceneChanger.Instance.MoveScene("GameScene", 1.0f, 1.0f, SceneChangeType.StarBlackFade);
+		_isSceneMoving = _currentSelectedStage.MoveScene();
 	}
 
 	private void MovePlayer(float position) {

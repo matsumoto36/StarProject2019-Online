@@ -155,7 +155,7 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 		CanPause = true;
 	}
 
-	public virtual void GameClear() {
+	public void GameClear() {
 
 		Debug.Log("GameClear!");
 

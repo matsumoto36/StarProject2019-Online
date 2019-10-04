@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using Matsumoto.Audio;
 using UnityEngine.Experimental.U2D.Animation;
+using Photon.Pun;
 
 namespace Matsumoto.Character {
 
@@ -28,6 +29,8 @@ namespace Matsumoto.Character {
 
 		public PlayerStatus StarStatus;
 		public PlayerStatus CircleStatus;
+		public PlayerController Controller;
+
 		public float MorphSpeed = 1;
 		public float ChargeSpeed = 1;
 		public float MaxChargePower = 500;
@@ -218,9 +221,9 @@ namespace Matsumoto.Character {
 
 			AttackUpdate();
 
-			MorphUpdate(Input.GetButton("Morph"));
+			MorphUpdate(Controller.GetButton("Morph"));
 
-			if(Input.GetKeyDown(KeyCode.P)) {
+			if(Controller.GetKeyDown(KeyCode.P)) {
 				ApplyDamage(gameObject, DamageType.Enemy);
 			}
 
@@ -268,7 +271,7 @@ namespace Matsumoto.Character {
 
 			if (IsFreeze) return;
 
-			var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+			var input = new Vector2(Controller.GetAxis("Horizontal"), Controller.GetAxis("Vertical"));
 
 			Move(input);
 			AnimationUpdate();
@@ -517,7 +520,7 @@ namespace Matsumoto.Character {
 
 
 			// 入力
-			if(CheckCanAttack() && Input.GetButtonDown("Attack")) {
+			if(CheckCanAttack() && Controller.GetButtonDown("Attack")) {
 				DoAttack();
 				_attackWait = AttackWaitTime;
 				_canAttack = false;
@@ -527,7 +530,7 @@ namespace Matsumoto.Character {
 
 		private void DoAttack() {
 
-			var input = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+			var input = new Vector2(Controller.GetAxis("Horizontal"), Controller.GetAxis("Vertical")).normalized;
 
 			if(input.x > 0) {
 				RollSpeed = _currentStatus.MaxDashSpeed;

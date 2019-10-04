@@ -11,8 +11,7 @@ namespace Matsumoto.Gimmick {
 
 		public override void GimmickStart() {
 
-			var player = transform
-				.Find(TargetPlayerName)
+			var player = GameObject.Find(TargetPlayerName)
 				.GetComponent<Player>();
 
 			player.transform.position = transform.position;

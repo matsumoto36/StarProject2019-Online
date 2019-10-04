@@ -22,9 +22,7 @@ namespace StarProject2019.Saitou
 
         [SerializeField] GameObject puropera;
 
-        GameObject _target;
-
-        Player _player;
+		Player[] _referencePlayers;
 
         [SerializeField] ParticleSystem particle;
 
@@ -36,9 +34,10 @@ namespace StarProject2019.Saitou
 
         void Start()
         {
-            _player = FindObjectOfType<Player>();
 
-            particleShape = particle.shape;
+			_referencePlayers = FindObjectsOfType<Player>();
+
+			particleShape = particle.shape;
 
             float z = (transform.parent.rotation.z > 0 ? transform.parent.rotation.z : transform.parent.rotation.z * -1);
             float w = (transform.parent.rotation.w > 0 ? transform.parent.rotation.w : transform.parent.rotation.w * -1);
@@ -77,17 +76,26 @@ namespace StarProject2019.Saitou
             if (isWallIgnore) layerMask = 1 << 10;
             else layerMask = 1 << 10 | 1 << 8 | 1 << 9;
 
-            RaycastHit2D hit = Physics2D.BoxCast(ray.origin,transform.localScale,0.0f, ray.direction,dis,layerMask);
+            var hits = Physics2D.BoxCastAll(ray.origin,transform.localScale,0.0f, ray.direction,dis,layerMask);
 
-            //なにかと衝突した時だけそのオブジェクトの名前をログに出す
-            if (hit.collider)
-            {
-                Debug.Log(hit.collider.gameObject.name);
-                Debug.DrawLine(transform.position, hit.collider.transform.position, Color.green);
-                _target = hit.collider.gameObject;
+			foreach(var hit in hits) {
+				//なにかと衝突した時だけそのオブジェクトの名前をログに出す
+				if(hit.collider) {
+					Debug.Log(hit.collider.gameObject.name);
+					Debug.DrawLine(transform.position, hit.collider.transform.position, Color.green);
 
-                ActiveEffect();
-            }
+					//TODO
+					_target = hit.collider.gameObject;
+					if(_chachedPlayer.gameObject != _target) {
+						_chachedPlayer = _target.GetComponent<Player>();
+					}
+
+
+					ActiveEffect();
+				}
+			}
+
+ 
         }
 
         /// <summary>
@@ -95,15 +103,13 @@ namespace StarProject2019.Saitou
         /// </summary>
         public void ActiveEffect()
         {
-            if (_player.gameObject != _target) return;
-            if (_player.State != PlayerState.Circle) return;
 
-            Rigidbody2D _rg = _target.GetComponent<Rigidbody2D>();
+			if(!_chachedPlayer) return;
+			if(_chachedPlayer.State != PlayerState.Circle) return;
+			if(!_chachedRig) return;
 
-            if (_rg == null) return;
-
-            float moveForceMultiplier = 2.0f;
-            _rg.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower * Time.deltaTime) - _rg.velocity));
+			float moveForceMultiplier = 2.0f;
+			_chachedRig.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower * Time.deltaTime) - _chachedRig.velocity));
 
         }
     }

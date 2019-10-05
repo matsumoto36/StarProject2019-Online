@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Matsumoto.Character;
 
@@ -22,9 +23,10 @@ namespace StarProject2019.Saitou
 
         [SerializeField] GameObject puropera;
 
-		Player[] _referencePlayers;
+		System.Tuple<Player, Rigidbody2D>[] _referencePlayers;
+		bool[] _isActivePlayerEffects;
 
-        [SerializeField] ParticleSystem particle;
+		[SerializeField] ParticleSystem particle;
 
         ParticleSystem.ShapeModule particleShape;
 
@@ -34,8 +36,11 @@ namespace StarProject2019.Saitou
 
         void Start()
         {
+			_referencePlayers = FindObjectsOfType<Player>()
+				.Select(item => new System.Tuple<Player, Rigidbody2D>(item, item.GetComponent<Rigidbody2D>()))
+				.ToArray();
 
-			_referencePlayers = FindObjectsOfType<Player>();
+			_isActivePlayerEffects = new bool[_referencePlayers.Length];
 
 			particleShape = particle.shape;
 
@@ -78,39 +83,48 @@ namespace StarProject2019.Saitou
 
             var hits = Physics2D.BoxCastAll(ray.origin,transform.localScale,0.0f, ray.direction,dis,layerMask);
 
+			_isActivePlayerEffects.Select(item => false);
+
 			foreach(var hit in hits) {
 				//なにかと衝突した時だけそのオブジェクトの名前をログに出す
 				if(hit.collider) {
-					Debug.Log(hit.collider.gameObject.name);
 					Debug.DrawLine(transform.position, hit.collider.transform.position, Color.green);
 
-					//TODO
-					_target = hit.collider.gameObject;
-					if(_chachedPlayer.gameObject != _target) {
-						_chachedPlayer = _target.GetComponent<Player>();
+					for(int i = 0;i < _referencePlayers.Length;i++) {
+						if(_referencePlayers[i].Item1.gameObject == hit.collider.gameObject) {
+							_isActivePlayerEffects[i] = true;
+							break;
+						}
 					}
 
-
-					ActiveEffect();
 				}
+
 			}
 
- 
-        }
+			ActiveEffect();
+		}
 
         /// <summary>
         /// 風の影響を与える
         /// </summary>
         public void ActiveEffect()
         {
+			for(int i = 0;i < _referencePlayers.Length;i++) {
+				if(!_isActivePlayerEffects[i]) {
+					continue;
+				}
 
-			if(!_chachedPlayer) return;
-			if(_chachedPlayer.State != PlayerState.Circle) return;
-			if(!_chachedRig) return;
+				var player = _referencePlayers[i].Item1;
+				var rigidbody = _referencePlayers[i].Item2;
 
-			float moveForceMultiplier = 2.0f;
-			_chachedRig.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower * Time.deltaTime) - _chachedRig.velocity));
+				if(!player) return;
+				if(player.State != PlayerState.Circle) return;
+				if(!rigidbody) return;
 
-        }
+				float moveForceMultiplier = 2.0f;
+				rigidbody.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower * Time.deltaTime) - rigidbody.velocity));
+
+			}
+		}
     }
 }

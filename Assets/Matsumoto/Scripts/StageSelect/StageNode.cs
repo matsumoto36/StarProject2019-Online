@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
+public enum NodeType {
+	None,
+	Select,
+	AutoSelect,
+	Skip,
+}
+
 public class StageNode : MonoBehaviour {
 
 	public string TargetStageName;
@@ -12,6 +19,9 @@ public class StageNode : MonoBehaviour {
 	public GameObject FollowerChipPrefab;
 	public List<Transform> FindedFollowerPositions = new List<Transform>();
 	public SpriteRenderer[] GateRenderers;
+
+	public NodeType NodeType;
+	public SceneChangeType SceneChangeType;
 
 	private Animator _gateAnimator;
 	private float _animSpeed = 2.0f;
@@ -143,7 +153,7 @@ public class StageNode : MonoBehaviour {
 	//}
 
 	public bool MoveScene() {
-		return SceneChanger.Instance.MoveScene(MoveSceneName, 1.0f, 1.0f, SceneChangeType.StarBlackFade);
+		return SceneChanger.Instance.MoveScene(MoveSceneName, 1.0f, 1.0f, SceneChangeType);
 	}
 
 	public void OnDrawGizmos() {

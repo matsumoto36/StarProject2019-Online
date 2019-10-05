@@ -83,7 +83,9 @@ namespace StarProject2019.Saitou
 
             var hits = Physics2D.BoxCastAll(ray.origin,transform.localScale,0.0f, ray.direction,dis,layerMask);
 
-			_isActivePlayerEffects.Select(item => false);
+			for(int i = 0;i < _isActivePlayerEffects.Length;i++) {
+				_isActivePlayerEffects[i] = false;
+			}
 
 			foreach(var hit in hits) {
 				//なにかと衝突した時だけそのオブジェクトの名前をログに出す

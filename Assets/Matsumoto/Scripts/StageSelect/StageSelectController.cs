@@ -4,11 +4,6 @@ using UnityEngine;
 using System.Linq;
 using Matsumoto.Audio;
 
-public enum StageSelectState {
-	Title,
-	Select,
-}
-
 public class StageSelectController : MonoBehaviour {
 
 	public const string LoadSceneKey = "LoadScene";
@@ -33,10 +28,6 @@ public class StageSelectController : MonoBehaviour {
 	private bool _isSceneMoving;
 
 	public float Position;
-
-	public StageSelectState State {
-		get; set;
-	} = StageSelectState.Title;
 
 	public bool IsFreeze {
 		get; set;
@@ -73,7 +64,6 @@ public class StageSelectController : MonoBehaviour {
 		FirstNode.SetUpNode(null, titleNodeIndex + stageProgress + 1, ref followerCount);
 
 		_targetStage = _currentSelectedStage = GetStageNode(_lastSelectedStageIndex);
-		if(_currentSelectedStage != TitleNode) State = StageSelectState.Select;
 
 		_playerPositionTarget = GetLength(_targetStage);
 
@@ -102,9 +92,7 @@ public class StageSelectController : MonoBehaviour {
 		if(IsFreeze) return;
 
 		if(Input.GetButtonDown("Attack")) {
-			if(State != StageSelectState.Title)
-
-				MoveScene();
+			MoveScene();
 		}
 
 		var p = Mathf.MoveTowards(Position, _playerPositionTarget, MoveSpeed * _moveSpeedMag * Time.deltaTime);
@@ -129,9 +117,14 @@ public class StageSelectController : MonoBehaviour {
 		}
 
 		if(p == Position) {
+			// ノードに到着した
 			_currentSelectedStage = _targetStage;
 			_currentSelectedStage.IsSelected = true;
-			State = _currentSelectedStage == TitleNode ? StageSelectState.Title : StageSelectState.Select;
+
+			// 自動で移動するノードであれば移動開始
+			if(_currentSelectedStage.NodeType == NodeType.AutoSelect) {
+				MoveScene();
+			}
 		}
 		else {
 			if(_currentSelectedStage)
@@ -145,6 +138,8 @@ public class StageSelectController : MonoBehaviour {
 
 	private void MoveScene() {
 		if(!_currentSelectedStage) return;
+		if(_currentSelectedStage.NodeType == NodeType.None) return;
+		if(_currentSelectedStage.NodeType == NodeType.Skip) return;
 		if(_isSceneMoving) return;
 		_isSceneMoving = true;
 
@@ -276,7 +271,12 @@ public class StageSelectController : MonoBehaviour {
 
 			if(Input.GetAxisRaw("Horizontal") < -Dead && t <= 0.0f) {
 				t = CursorWait;
-				var prev = _targetStage.PrevStage;
+
+				StageNode prev = _targetStage.PrevStage;
+				while(prev && prev.NodeType == NodeType.Skip) {
+					prev = prev.PrevStage;
+				}
+
 				if (prev) {
 					AudioManager.PlaySE("MenuSelect", position: prev.transform.position);
 					SetTarget(prev);
@@ -284,7 +284,12 @@ public class StageSelectController : MonoBehaviour {
 			}
 			if(Input.GetAxisRaw("Horizontal") > Dead && t >= 0.0f) {
 				t = -CursorWait;
-				var next = _targetStage.NextStage;
+
+				StageNode next = _targetStage.NextStage;
+				while(next && next.NodeType == NodeType.Skip) {
+					next = next.NextStage;
+				}
+
 				if (next && _targetStage.IsCleared) {
 					AudioManager.PlaySE("MenuSelect", position: next.transform.position);
 					SetTarget(next);

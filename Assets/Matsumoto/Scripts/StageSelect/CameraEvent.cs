@@ -52,9 +52,6 @@ public class CameraEvent : MonoBehaviour, IStageMoveEvent {
 		}
 
 		controller.IsFreeze = false;
-		if(CanStateChange) {
-			controller.State = forward ? StageSelectState.Select : StageSelectState.Title;
-		}
 	}
 
 	private void OnDrawGizmos() {

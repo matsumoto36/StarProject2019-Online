@@ -23,6 +23,7 @@ public class StageSelectController : MonoBehaviour {
 	private StageNode _targetStage;
 	private float _playerPositionTarget;
 	private Transform _playerBody;
+	private Transform _playerEye;
 	private float _moveSpeedMag = 1;
 	private List<IStageMoveEvent> _eventList;
 	private bool _isSceneMoving;
@@ -37,6 +38,7 @@ public class StageSelectController : MonoBehaviour {
 	void Start () {
 
 		_playerBody = PlayerModel.Find("Body").Find("StarWithBone");
+		_playerEye = PlayerModel.Find("Eye").Find("eye");
 
 		// イベント読み込み
 		_eventList = GetComponentsInChildren<MonoBehaviour>()
@@ -228,7 +230,9 @@ public class StageSelectController : MonoBehaviour {
 	private void SetTarget(StageNode node) {
 		_targetStage = node;
 		_playerPositionTarget = GetLength(_targetStage);
-		_moveSpeedMag = 1 + Mathf.Abs(Position - _playerPositionTarget) * 0.8f;
+		var diff = _playerPositionTarget - Position;
+		_moveSpeedMag = 1 + Mathf.Abs(diff) * 0.8f;
+		_playerEye.transform.localScale = new Vector3(Mathf.Sign(diff), 1, 1);
 	}
 
 	public Vector3 GetPosition(float position) {

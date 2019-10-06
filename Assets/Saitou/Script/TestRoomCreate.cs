@@ -15,16 +15,18 @@ namespace Saitou.Online
         {
             Connect = FindObjectOfType<OnlineConnect>();
 
+            Connect.OnJoinLobbySuccess = () =>
+            {
+                if (PhotonNetwork.InRoom == false)
+                {
+                    Connect.CreateOrJoinRoom("room01");
+                }
+            };
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Update()
         {
-            if (PhotonNetwork.InRoom == false)
-            {
-                if (Input.GetMouseButtonDown(0)) Connect.CreateAndJoinRoom("room01");
-                if (Input.GetMouseButtonDown(1)) Connect.JoinRoom("room01");
-            }
+           
         }
     }
 }

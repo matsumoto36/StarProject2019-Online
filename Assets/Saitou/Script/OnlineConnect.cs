@@ -65,7 +65,7 @@ namespace Saitou.Online
         /// 部屋を作成し、入出
         /// </summary>
         /// <param name="_roomName"></param>
-        public void CreateAndJoinRoom(string _roomName)
+        public void CreateOrJoinRoom(string _roomName)
         {
             RoomOptions roomOptions = new RoomOptions
             {
@@ -82,7 +82,7 @@ namespace Saitou.Online
             // 部屋を作成して入室する
             if (PhotonNetwork.InLobby)
             {
-                PhotonNetwork.CreateRoom(_roomName, roomOptions);
+                PhotonNetwork.JoinOrCreateRoom(_roomName, roomOptions, TypedLobby.Default);
             }
         }
 

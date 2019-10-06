@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System;
 using UnityEngine.SceneManagement;
 using Matsumoto.Gimmick;
@@ -16,12 +15,19 @@ public class BattleStageController : MonoBehaviour, IStageController {
 	public event Action<IStageController> OnGameClear;
 	public event Action<IStageController> OnGameOver;
 
+	public BattleScoreViewer Viewer;
+
 	public bool IsCreateStage = true;
 	public bool IsOverride = false;
 	public bool IsReturnToSelect = true;
 
 	public string StagePath = "TestStage";
 	private List<GimmickChip> _gimmicks = new List<GimmickChip>();
+
+	private Saitou.Online.OnlineManager _onlineManager;
+
+	private Player[] _players;
+	private bool[] _deathPlayers;
 
 	public bool CanPause {
 		get; set;
@@ -46,14 +52,36 @@ public class BattleStageController : MonoBehaviour, IStageController {
 			item.GimmickStart();
 		}
 
+
 		//PauseMenuCanvas.SetStageController(this);
 		//PauseMenuCanvas.gameObject.SetActive(false);
 
-		// プレイヤーが死亡したらゲームオーバー
-		//FindObjectOfType<Player>().OnDeath += (_) => {
-		//	GameOver();
-		//};
+		_players = FindObjectsOfType<Player>()
+			.OrderBy(item => item.GetComponent<Saitou.Online.OnlineState>()._PlayerList)
+			.ToArray();
 
+		_deathPlayers = new bool[_players.Length];
+
+		for(int i = 0;i < _players.Length;i++) {
+			_players[i].OnDeath += (_) => {
+				_deathPlayers[i] = true;
+				_players[i].IsFreeze = true;
+
+				var count = 0;
+				var leaveID = -1;
+				foreach(var item in _deathPlayers) {
+					if(!item) {
+						leaveID = count;
+					}
+					count++;
+				}
+				if(count <= 1) {
+					Result(leaveID);
+				}
+			};
+		}
+
+		_onlineManager = FindObjectOfType<Saitou.Online.OnlineManager>();
 	}
 
 	// Use this for initialization
@@ -134,5 +162,18 @@ public class BattleStageController : MonoBehaviour, IStageController {
 
 		var sceneName = SceneManager.GetActiveScene().name;
 		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade);
+	}
+
+	private void Result(int winPlayerId) {
+
+		_players[winPlayerId].IsFreeze = true;
+
+		// TODO 得点の設定と一時保存
+		//GameData.Instance.
+	}
+
+	[ContextMenu("ShowScore")]
+	public void ShowResult() {
+		Viewer.ShowScore(_players, new int[] { 1, 2 }, 3, 0);
 	}
 }

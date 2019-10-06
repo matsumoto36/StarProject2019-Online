@@ -232,7 +232,7 @@ public class StageSelectController : MonoBehaviour {
 		_playerPositionTarget = GetLength(_targetStage);
 		var diff = _playerPositionTarget - Position;
 		_moveSpeedMag = 1 + Mathf.Abs(diff) * 0.8f;
-		_playerEye.transform.localScale = new Vector3(Mathf.Sign(diff), 1, 1);
+		_playerEye.localScale = new Vector3(Mathf.Sign(diff), 1, 1);
 	}
 
 	public Vector3 GetPosition(float position) {

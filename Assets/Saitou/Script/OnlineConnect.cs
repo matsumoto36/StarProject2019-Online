@@ -34,7 +34,7 @@ namespace Saitou.Online
 
         void Start()
         {
-            Connect("1.0");
+            Connect("2.0");
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Saitou.Online
         /// 部屋を作成し、入出
         /// </summary>
         /// <param name="_roomName"></param>
-        public void CreateOrJoinRoom(string _roomName)
+        public void CreateOrJoinRoom()
         {
             RoomOptions roomOptions = new RoomOptions
             {
@@ -82,7 +82,7 @@ namespace Saitou.Online
             // 部屋を作成して入室する
             if (PhotonNetwork.InLobby)
             {
-                PhotonNetwork.JoinOrCreateRoom(_roomName, roomOptions, TypedLobby.Default);
+                PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
             }
         }
 
@@ -90,11 +90,11 @@ namespace Saitou.Online
         /// 名前指定の部屋に入室
         /// </summary>
         /// <param name="_roomName"></param>
-        public void JoinRoom(string _roomName)
+        public void JoinRoom()
         {
             if (PhotonNetwork.InLobby)
             {
-                PhotonNetwork.JoinRoom(_roomName);
+                PhotonNetwork.JoinRoom(roomName);
             }
         }
 
@@ -166,6 +166,7 @@ namespace Saitou.Online
         {
             if (PhotonNetwork.InRoom)
             {
+                Debug.Log("退出");
                 // 退室
                 PhotonNetwork.LeaveRoom();
             }

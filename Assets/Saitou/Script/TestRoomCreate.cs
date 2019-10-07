@@ -19,7 +19,7 @@ namespace Saitou.Online
             {
                 if (PhotonNetwork.InRoom == false)
                 {
-                    Connect.CreateOrJoinRoom("room01");
+                    Connect.CreateOrJoinRoom();
                 }
             };
         }

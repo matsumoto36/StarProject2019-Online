@@ -63,9 +63,11 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		_deathPlayers = new bool[_players.Length];
 
 		for(int i = 0;i < _players.Length;i++) {
-			_players[i].OnDeath += (_) => {
-				_deathPlayers[i] = true;
-				_players[i].IsFreeze = true;
+			var playerID = i;
+			_players[playerID].OnDeath += (_) => {
+				Debug.Log("DeathPlayer " + playerID);
+				_deathPlayers[playerID] = true;
+				_players[playerID].IsFreeze = true;
 
 				var count = 0;
 				var leaveID = -1;
@@ -73,10 +75,12 @@ public class BattleStageController : MonoBehaviour, IStageController {
 					if(!item) {
 						leaveID = count;
 					}
-					count++;
+					else {
+						count++;
+					}
 				}
 				if(count <= 1) {
-					Result(leaveID);
+					StartCoroutine(Result(leaveID));
 				}
 			};
 		}
@@ -164,12 +168,36 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade);
 	}
 
-	private void Result(int winPlayerId) {
+	private IEnumerator Result(int winPlayerId) {
+
+		Debug.Log("WinPlayer " + winPlayerId);
+
+		// BGMを止める
+		AudioManager.FadeOut(0.2f);
 
 		_players[winPlayerId].IsFreeze = true;
 
 		// TODO 得点の設定と一時保存
-		//GameData.Instance.
+		var points = new int[_players.Length];
+		GameData.Instance.GetData("BattlePoints", ref points);
+
+		yield return new WaitForSeconds(1.0f);
+		yield return Viewer.ShowScore(_players, points, 3, winPlayerId);
+		yield return new WaitForSeconds(1.0f);
+
+		points[winPlayerId]++;
+
+		var sceneName = SceneManager.GetActiveScene().name;
+
+		if(points[winPlayerId] >= 3) {
+			// 勝利
+			Viewer.ShowWinner(_players, winPlayerId);
+			yield return new WaitForSeconds(5.0f);
+			points = new int[_players.Length];
+		}
+
+		GameData.Instance.SetData("BattlePoints", points);
+		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade);
 	}
 
 	[ContextMenu("ShowScore")]

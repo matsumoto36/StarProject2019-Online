@@ -12,7 +12,7 @@ namespace Matsumoto.Character
 	public class OnlinePlayerController : MonoBehaviourPunCallbacks, IPlayerController
     {
         
-        private PhotonView _photonView;
+        PhotonView _photonView;
         
         OnlineState state;
         OnlineManager manager;

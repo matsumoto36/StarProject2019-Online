@@ -124,7 +124,7 @@ namespace StarProject2019.Saitou
 				if(!rigidbody) return;
 
 				float moveForceMultiplier = 2.0f;
-				rigidbody.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower * Time.deltaTime) - rigidbody.velocity));
+				rigidbody.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower - rigidbody.velocity) * Time.deltaTime));
 
 			}
 		}

@@ -6,14 +6,14 @@ namespace Matsumoto.Character {
 	/// <summary>
 	/// プレイヤーの入力を取得する
 	/// </summary>
-	public abstract class PlayerController : MonoBehaviour {
+	public interface IPlayerController{
 
-		public abstract bool GetButton(string buttonName);
-		public abstract bool GetButtonDown(string buttonName);
+		bool GetButton(string buttonName);
+		bool GetButtonDown(string buttonName);
 
-		public abstract bool GetKeyDown(KeyCode key);
+		bool GetKeyDown(KeyCode key);
 
-		public abstract float GetAxis(string axisName);
+		float GetAxis(string axisName);
 
 	}
 

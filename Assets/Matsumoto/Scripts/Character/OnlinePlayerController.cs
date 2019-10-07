@@ -9,7 +9,7 @@ namespace Matsumoto.Character
     /// <summary>
 	/// 通常のプレイヤーの入力
 	/// </summary>
-	public class OnlinePlayerController : PlayerController
+	public class OnlinePlayerController : MonoBehaviourPunCallbacks, IPlayerController
     {
         
         private PhotonView _photonView;
@@ -35,7 +35,7 @@ namespace Matsumoto.Character
             keyCache.Add(KeyCode.P, false);
         }
         
-		public override float GetAxis(string axisName)
+		public float GetAxis(string axisName)
         {
             if (!PhotonNetwork.InRoom) return 0.0f;
 
@@ -51,7 +51,7 @@ namespace Matsumoto.Character
             return input;
         }
         
-		public override bool GetButton(string buttonName)
+		public bool GetButton(string buttonName)
         {
             if (!PhotonNetwork.InRoom) return false;
 
@@ -61,11 +61,11 @@ namespace Matsumoto.Character
             }
             
 			var input = Input.GetButton(buttonName);
-            _photonView.RPC(nameof(SetButtonCache), RpcTarget.Others, buttonName, input);
+            _photonView.RPC(nameof(SetButtonCache), RpcTarget.All, buttonName, input);
             return input;
         }
         
-		public override bool GetButtonDown(string buttonName)
+		public bool GetButtonDown(string buttonName)
         {
             if (!PhotonNetwork.InRoom) return false;
 
@@ -78,11 +78,12 @@ namespace Matsumoto.Character
             }
             
 			var input = Input.GetButton(buttonName);
-            _photonView.RPC(nameof(SetButtonCache), RpcTarget.Others, buttonName, input);
+            _photonView.RPC(nameof(SetButtonCache), RpcTarget.All, buttonName, input);
             return input;
         }
 
-		public override bool GetKeyDown(KeyCode key)
+        
+		public bool GetKeyDown(KeyCode key)
         {
             if (!PhotonNetwork.InRoom) return false;
 
@@ -94,7 +95,7 @@ namespace Matsumoto.Character
             }
             
 			var input = Input.GetKeyDown(key);
-            _photonView.RPC(nameof(SetKeyCache), RpcTarget.Others, key, input);
+            //_photonView.RPC(nameof(SetKeyCache), RpcTarget.All, key, input);
             return input;
         }
         
@@ -110,7 +111,6 @@ namespace Matsumoto.Character
             buttonCache[button] = value;
         }
         
-		[PunRPC]
         private void SetKeyCache(KeyCode key, bool value)
         {
             keyCache[key] = value;

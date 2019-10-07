@@ -29,7 +29,7 @@ namespace Matsumoto.Character {
 
 		public PlayerStatus StarStatus;
 		public PlayerStatus CircleStatus;
-		public PlayerController Controller;
+		IPlayerController Controller;
 
 		public float MorphSpeed = 1;
 		public float ChargeSpeed = 1;
@@ -137,7 +137,8 @@ namespace Matsumoto.Character {
 
 			_animator = GetComponent<Animator>();
 			PlayerRig = GetComponent<Rigidbody2D>();
-			_eye = transform.Find("Eye");
+            Controller = gameObject.FindGameObjectInterface<IPlayerController>();
+            _eye = transform.Find("Eye");
 
 			_body = transform.Find("Body").GetComponent<SpriteRenderer>();
 			_bodyWithBone = _body.transform.Find("StarWithBone").GetComponent<SpriteRenderer>();
@@ -223,9 +224,11 @@ namespace Matsumoto.Character {
 
 			MorphUpdate(Controller.GetButton("Morph"));
 
+            /*
 			if(Controller.GetKeyDown(KeyCode.P)) {
 				ApplyDamage(gameObject, DamageType.Enemy);
 			}
+            */
 
 			// エフェクト操作
 			var main = AttackEffect.main;
@@ -275,6 +278,7 @@ namespace Matsumoto.Character {
 
 			Move(input);
 			AnimationUpdate();
+
 		}
 
 		private void CheckBlockSide() {
@@ -549,6 +553,7 @@ namespace Matsumoto.Character {
 			// 攻撃判定
 			_lastAttackedTime = Time.time;
 			ToggleAttackState(true);
+
 		}
 
 		private void ChangeState(PlayerState state, bool isForce = false) {

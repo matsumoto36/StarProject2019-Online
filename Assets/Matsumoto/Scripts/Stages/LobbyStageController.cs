@@ -1,14 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 using System;
-using UnityEngine.SceneManagement;
 using Matsumoto.Gimmick;
 using Matsumoto.Audio;
-using Matsumoto.Character;
-using Matsumoto;
+using UnityEngine.UI;
 
 public class LobbyStageController : MonoBehaviour, IStageController {
 
@@ -17,6 +13,7 @@ public class LobbyStageController : MonoBehaviour, IStageController {
 	public event Action<IStageController> OnGameOver;
 
 	public LobbyButtonController ButtonController;
+	public Text RoomNameText;
 
 	private List<GimmickChip> _gimmicks = new List<GimmickChip>();
 
@@ -54,13 +51,17 @@ public class LobbyStageController : MonoBehaviour, IStageController {
 		// BGMを鳴らす
 		AudioManager.FadeIn(1.0f, "vigilante");
 
+		RoomNameText.text = "";
+
 		ButtonController.OnCreateRoomButtonClick += () => {
 			GameStart();
+			RoomNameText.text = "RoomName : " + ButtonController.SetedLobbyName;
 			ButtonController.IsActive = false;
 		};
 
 		ButtonController.OnInRoomButtonClick += () => {
 			GameStart();
+			RoomNameText.text = "RoomName : " + ButtonController.SetedLobbyName;
 			ButtonController.IsActive = false;
 		};
 

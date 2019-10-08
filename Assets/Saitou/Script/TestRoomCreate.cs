@@ -16,7 +16,7 @@ namespace Saitou.Online
 
         private void Update()
         {
-            Debug.Log(OnlineData.PlayerID);
+            //Debug.Log(OnlineData.PlayerID);
             //Debug.Log(PhotonNetwork.AutomaticallySyncScene);
         }
     }

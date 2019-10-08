@@ -15,31 +15,20 @@ namespace Saitou.Online
     public class LobbyConnect : MonoBehaviourPunCallbacks,IInRoomCallbacks
     {
         OnlineConnect _connect;
+        LobbyButtonController _lobbyButtonController;
 
-        public Button[] JoinButton;
+        public string RoomName;
 
         void Start()
         {
             DontDestroyOnLoad(gameObject);
 
+            _lobbyButtonController = FindObjectOfType<LobbyButtonController>();
+            _lobbyButtonController.OnCreateRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
+            _lobbyButtonController.OnInRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
+
             _connect = FindObjectOfType<OnlineConnect>();
             _connect.Connect("2.0");
-
-            for(int i = 0; i < JoinButton.Length; i++)
-            {
-                // ロビー接続までボタンが押せないようにする
-                JoinButton[i].enabled = false;
-            }
-
-            // 接続されたらボタンを有効化
-            _connect.OnJoinLobbySuccess = () => 
-            {
-                for (int i = 0; i < JoinButton.Length; i++)
-                {
-                    // ロビー接続までボタンが押せないようにする
-                    JoinButton[i].enabled = true;
-                }
-            };
         }
 
         /// <summary>
@@ -47,13 +36,7 @@ namespace Saitou.Online
         /// </summary>
         public override void OnJoinedRoom()
         {
-            //Debug.Log("入ったよ");
-            Debug.Log("PlayerID" + PhotonNetwork.PlayerList.Length);
             OnlineData.PlayerID = PhotonNetwork.PlayerList.Length;
-            //PhotonNetwork.AutomaticallySyncScene = false;
-            ////PhotonNetwork.LoadLevel("BattleScene");
-            //SceneManager.LoadScene("BattleScene");
-            ////SceneManager.LoadScene("BattleScene", LoadSceneMode.Additive);
         }
 
         public override void OnPlayerEnteredRoom(Player newPlayer)
@@ -67,14 +50,6 @@ namespace Saitou.Online
                 PhotonNetwork.LoadLevel("BattleScene");
             }
             
-        }
-
-        void Update()
-        {
-            //if(Input.GetMouseButtonDown(0))
-            //{
-            //    Debug.Log(OnlineData.Instance.PlayerID);
-            //}
         }
 
         public void CreateRoom()

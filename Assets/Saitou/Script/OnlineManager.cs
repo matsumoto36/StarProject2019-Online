@@ -15,11 +15,6 @@ namespace Saitou.Online
 
     public class OnlineManager : MonoBehaviour
     {
-        public void SetOnlineData()
-        {
-            if (!PhotonNetwork.InRoom) return;
 
-            OnlineData.Instance.SetPlayerID(PhotonNetwork.PlayerList.Length);
-        }
     }
 }

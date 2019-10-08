@@ -45,17 +45,27 @@ namespace Saitou.Online
 
             _connect.CreateOrJoinRoom("Test");
 
-            _connect.OnJoinRoomSuccess = () => 
-            {
-                SetOnlineData();
-                SceneManager.LoadScene("BattleScene");
-            };
+            StartCoroutine(LoadScene());
+        }
+
+        IEnumerator LoadScene()
+        {
+            yield return new WaitForSeconds(1.5f);
+
+            SetOnlineData();
+
+            yield return new WaitForSeconds(0.5f);
+
+            SceneManager.LoadScene("BattleScene");
+            Debug.Log("遷移");
         }
 
         public void SetOnlineData()
         {
+            Debug.Log(PhotonNetwork.PlayerList.Length);
             OnlineData.Instance.SetPlayerID(PhotonNetwork.PlayerList.Length);
         }
+
 
     }
 }

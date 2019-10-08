@@ -5,7 +5,7 @@ using Saitou.Online;
 
 public class OnlineData : SingletonMonoBehaviour<OnlineData> {
 
-    int playerID = 1;
+    int playerID = 0;
     public int PlayerID { get { return playerID; } }
 
 

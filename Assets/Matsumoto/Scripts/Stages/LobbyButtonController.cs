@@ -6,8 +6,10 @@ using UnityEngine.Events;
 
 public class LobbyButtonController : MonoBehaviour {
 
+	public RectTransform ParentCanvas;
 	public Button[] Buttons;
 	public RectTransform Cursor;
+	public InputField RobbyNameField;
 
 	public event UnityAction OnCreateRoomButtonClick;
 	public event UnityAction OnInRoomButtonClick;
@@ -17,9 +19,21 @@ public class LobbyButtonController : MonoBehaviour {
 	private float _controllerDead = 0.3f;
 	private bool _canMoveCursor = true;
 
+	private bool _isActive = true;
 	public bool IsActive {
-		get; set;
-	} = true;
+		get { return _isActive; }
+		set {
+			if(_isActive == value) return;
+			_isActive = value;
+			ParentCanvas.gameObject.SetActive(_isActive);
+		}
+	}
+
+	public string SetedLobbyName {
+		get {
+			return RobbyNameField.text;
+		}
+	}
 
 	private void Awake() {
 

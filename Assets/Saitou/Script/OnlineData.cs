@@ -3,15 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Saitou.Online;
 
-public class OnlineData : SingletonMonoBehaviour<OnlineData> {
+public class OnlineData {
 
-    int playerID = 0;
-    public int PlayerID { get { return playerID; } }
-
-
-    public void SetPlayerID(int id)
-    {
-        playerID = id;
-    }
-
+    public static int PlayerID { get; set; }
 }

@@ -39,7 +39,7 @@ namespace Matsumoto.Character
         {
             if (!PhotonNetwork.InRoom) return 0.0f;
 
-            if ((int)state._PlayerList != OnlineData.Instance.PlayerID)
+            if ((int)state._PlayerList != OnlineData.PlayerID)
             {
                 // 自分以外は送られたキャッシュを使う
                 return axisCache[axisName];
@@ -55,7 +55,7 @@ namespace Matsumoto.Character
         {
             if (!PhotonNetwork.InRoom) return false;
 
-            if ((int)state._PlayerList != OnlineData.Instance.PlayerID)
+            if ((int)state._PlayerList != OnlineData.PlayerID)
             {
                 return buttonCache[buttonName];
             }
@@ -69,7 +69,7 @@ namespace Matsumoto.Character
         {
             if (!PhotonNetwork.InRoom) return false;
 
-            if ((int)state._PlayerList != OnlineData.Instance.PlayerID)
+            if ((int)state._PlayerList != OnlineData.PlayerID)
             {
                 var cache = buttonCache[buttonName];
                 // ButtonDownなので一回判定をとったらfalseにする
@@ -87,7 +87,7 @@ namespace Matsumoto.Character
         {
             if (!PhotonNetwork.InRoom) return false;
 
-            if ((int)state._PlayerList != OnlineData.Instance.PlayerID)
+            if ((int)state._PlayerList != OnlineData.PlayerID)
             {
                 var cache = keyCache[key];
                 keyCache[key] = false;

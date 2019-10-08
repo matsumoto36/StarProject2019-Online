@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 using UnityEngine.UI;
+using UniRx;
 using UnityEngine.SceneManagement;
 
 namespace Saitou.Online
 {
 
-    public class LobbyConnect : MonoBehaviour
+    public class LobbyConnect : MonoBehaviourPunCallbacks
     {
         OnlineConnect _connect;
 
@@ -39,33 +40,29 @@ namespace Saitou.Online
             };
         }
 
+        void Update()
+        {
+            //if(Input.GetMouseButtonDown(0))
+            //{
+            //    Debug.Log(OnlineData.Instance.PlayerID);
+            //}
+        }
+
         public void CreateRoom()
         {
             if (!PhotonNetwork.InLobby) return;
 
+
+
+            _connect.OnJoinRoomSuccess += () =>
+            {
+                Debug.Log("PlayerID" + PhotonNetwork.PlayerList.Length);
+                OnlineData.PlayerID = PhotonNetwork.PlayerList.Length;
+                PhotonNetwork.AutomaticallySyncScene = false;
+                SceneManager.LoadScene("BattleScene");
+            };
+
             _connect.CreateOrJoinRoom("Test");
-
-            StartCoroutine(LoadScene());
         }
-
-        IEnumerator LoadScene()
-        {
-            yield return new WaitForSeconds(1.5f);
-
-            SetOnlineData();
-
-            yield return new WaitForSeconds(0.5f);
-
-            SceneManager.LoadScene("BattleScene");
-            Debug.Log("遷移");
-        }
-
-        public void SetOnlineData()
-        {
-            Debug.Log(PhotonNetwork.PlayerList.Length);
-            OnlineData.Instance.SetPlayerID(PhotonNetwork.PlayerList.Length);
-        }
-
-
     }
 }

@@ -103,7 +103,7 @@ public class PatrolEnemy : EnemyBase, IEnemy
     public void Action()
     {
         // プレイヤー判定用レイヤー
-        int playerLayer = LayerMask.GetMask("Player");
+        int playerLayer = LayerMask.GetMask("Player", "Ground", "CanStickGround");
 
         // LineRendererをアクティブにする
         if (lineRen.enabled == false && visible == true) {

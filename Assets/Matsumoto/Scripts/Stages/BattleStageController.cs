@@ -207,10 +207,18 @@ public class BattleStageController : MonoBehaviour, IStageController {
 			Viewer.ShowWinner(_players, winPlayerId);
 			yield return new WaitForSeconds(5.0f);
 			points = new int[_players.Length];
+			GameData.Instance.SetData("BattlePoints", points);
+
+			// 退出
+			FindObjectOfType<Saitou.Online.OnlineConnect>()
+				.LeaveRoom();
+
+			SceneChanger.Instance.MoveScene("LobbyScene", 0.2f, 0.2f, SceneChangeType.BlackFade);
+			yield break;
 		}
 
 		GameData.Instance.SetData("BattlePoints", points);
-		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade);
+		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade, true);
 	}
 
 	[ContextMenu("ShowScore")]

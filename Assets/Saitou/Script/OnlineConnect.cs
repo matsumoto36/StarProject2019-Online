@@ -26,12 +26,12 @@ namespace Saitou.Online
 
         void Awake()
         {
-            PhotonNetwork.AutomaticallySyncScene = true;
+
         }
 
         void Start()
         {
-
+            PhotonNetwork.AutomaticallySyncScene = true;
         }
 
         /// <summary>

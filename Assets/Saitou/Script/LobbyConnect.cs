@@ -12,7 +12,7 @@ using UnityEngine.SceneManagement;
 namespace Saitou.Online
 {
 
-    public class LobbyConnect : MonoBehaviourPunCallbacks
+    public class LobbyConnect : MonoBehaviourPunCallbacks,IInRoomCallbacks
     {
         OnlineConnect _connect;
 
@@ -20,6 +20,8 @@ namespace Saitou.Online
 
         void Start()
         {
+            DontDestroyOnLoad(gameObject);
+
             _connect = FindObjectOfType<OnlineConnect>();
             _connect.Connect("2.0");
 
@@ -40,6 +42,33 @@ namespace Saitou.Online
             };
         }
 
+        /// <summary>
+        /// 部屋に入室したとき
+        /// </summary>
+        public override void OnJoinedRoom()
+        {
+            //Debug.Log("入ったよ");
+            Debug.Log("PlayerID" + PhotonNetwork.PlayerList.Length);
+            OnlineData.PlayerID = PhotonNetwork.PlayerList.Length;
+            //PhotonNetwork.AutomaticallySyncScene = false;
+            ////PhotonNetwork.LoadLevel("BattleScene");
+            //SceneManager.LoadScene("BattleScene");
+            ////SceneManager.LoadScene("BattleScene", LoadSceneMode.Additive);
+        }
+
+        public override void OnPlayerEnteredRoom(Player newPlayer)
+        {
+            base.OnPlayerEnteredRoom(newPlayer);
+
+            if (!PhotonNetwork.IsMasterClient) return;
+            
+            if(PhotonNetwork.PlayerList.Length >= 2)
+            {
+                PhotonNetwork.LoadLevel("BattleScene");
+            }
+            
+        }
+
         void Update()
         {
             //if(Input.GetMouseButtonDown(0))
@@ -51,16 +80,6 @@ namespace Saitou.Online
         public void CreateRoom()
         {
             if (!PhotonNetwork.InLobby) return;
-
-
-
-            _connect.OnJoinRoomSuccess += () =>
-            {
-                Debug.Log("PlayerID" + PhotonNetwork.PlayerList.Length);
-                OnlineData.PlayerID = PhotonNetwork.PlayerList.Length;
-                PhotonNetwork.AutomaticallySyncScene = false;
-                SceneManager.LoadScene("BattleScene");
-            };
 
             _connect.CreateOrJoinRoom("Test");
         }

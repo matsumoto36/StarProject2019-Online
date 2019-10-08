@@ -25,6 +25,7 @@ public class BattleStageController : MonoBehaviour, IStageController {
 	private List<GimmickChip> _gimmicks = new List<GimmickChip>();
 
 	private Saitou.Online.OnlineManager _onlineManager;
+    private PlayerCamera _playerCamera;
 
 	private Player[] _players;
 	private bool[] _deathPlayers;
@@ -85,7 +86,19 @@ public class BattleStageController : MonoBehaviour, IStageController {
 			};
 		}
 
-		_onlineManager = FindObjectOfType<Saitou.Online.OnlineManager>();
+        var player = FindObjectsOfType<Saitou.Online.OnlineState>();
+        _playerCamera = FindObjectOfType<PlayerCamera>();
+
+        for (int i = 0; i < player.Length; i++)
+        {
+            if (OnlineData.PlayerID == (int)player[i]._PlayerList)
+            {
+                _playerCamera.TargetPlayer = player[i].GetComponent<Player>();
+                break;
+            }
+        }
+
+       _onlineManager = FindObjectOfType<Saitou.Online.OnlineManager>();
 	}
 
 	// Use this for initialization

@@ -27,10 +27,16 @@ public class SceneChanger : SingletonMonoBehaviour<SceneChanger> {
 		LoadShader();
 	}
 
-	public bool MoveScene(string sceneName, float fadeInTime, float fadeOutTime, SceneChangeType type) {
+	public bool MoveScene(string sceneName, float fadeInTime, float fadeOutTime, SceneChangeType type, bool isPhoton = false) {
 		if(_isMoving) return false;
 		_fadeType = materials[(int)type];
-		StartCoroutine(MoveSceneAnim(sceneName, fadeInTime, fadeOutTime));
+
+		if(isPhoton) {
+			StartCoroutine(MoveSceneAnim(sceneName, fadeInTime, fadeOutTime));
+		}
+		else {
+			StartCoroutine(MoveScenePhotonAnim(sceneName, fadeInTime, fadeOutTime));
+		}
 		return true;
 	}
 
@@ -57,6 +63,27 @@ public class SceneChanger : SingletonMonoBehaviour<SceneChanger> {
 
 		operation.allowSceneActivation = true;
 		yield return operation;
+		PauseSystem.Instance.Resume();
+
+		while(_ratio > 0.0f) {
+			_ratio = Mathf.Max(_ratio - Time.unscaledDeltaTime / fadeOutTime, 0.0f);
+			yield return null;
+		}
+
+		_isMoving = false;
+	}
+
+	private IEnumerator MoveScenePhotonAnim(string sceneName, float fadeInTime, float fadeOutTime) {
+
+		_isMoving = true;
+
+		_ratio = 0;
+		while(_ratio < 1.0f) {
+			_ratio = Mathf.Min(_ratio + Time.unscaledDeltaTime / fadeInTime, 1.0f);
+			yield return null;
+		}
+
+		Photon.Pun.PhotonNetwork.LoadLevel(sceneName);
 		PauseSystem.Instance.Resume();
 
 		while(_ratio > 0.0f) {

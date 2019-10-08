@@ -40,6 +40,10 @@ namespace StarProject2019.Saitou
 				.Select(item => new System.Tuple<Player, Rigidbody2D>(item, item.GetComponent<Rigidbody2D>()))
 				.ToArray();
 
+			foreach(var item in _referencePlayers) {
+				Debug.Log(item.Item1.name + " " + item.Item2.name);
+			}
+
 			_isActivePlayerEffects = new bool[_referencePlayers.Length];
 
 			particleShape = particle.shape;
@@ -119,9 +123,9 @@ namespace StarProject2019.Saitou
 				var player = _referencePlayers[i].Item1;
 				var rigidbody = _referencePlayers[i].Item2;
 
-				if(!player) return;
-				if(player.State != PlayerState.Circle) return;
-				if(!rigidbody) return;
+				if(!player) continue;
+				if(player.State != PlayerState.Circle) continue;
+				if(!rigidbody) continue;
 
 				float moveForceMultiplier = 2.0f;
 				rigidbody.AddForce(moveForceMultiplier * (((Vector2)transform.up.normalized * windPower - rigidbody.velocity) * Time.deltaTime));

@@ -8,25 +8,15 @@ namespace Saitou.Online
     public class TestRoomCreate : MonoBehaviourPunCallbacks
     {
 
-        public OnlineConnect Connect;
-
         // Use this for initialization
         void Start()
         {
-            Connect = FindObjectOfType<OnlineConnect>();
 
-            Connect.OnJoinLobbySuccess = () =>
-            {
-                if (PhotonNetwork.InRoom == false)
-                {
-                    Connect.CreateOrJoinRoom();
-                }
-            };
         }
 
         private void Update()
         {
-           
+
         }
     }
 }

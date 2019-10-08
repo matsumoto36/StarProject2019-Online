@@ -20,9 +20,6 @@ namespace Saitou.Online
         // 入室の可否
         [SerializeField] bool isOpen = true;
 
-        // 部屋名
-        [SerializeField] string roomName = "hoshimaru";
-
         public Action OnJoinRoomFiled { get; set; }
         public Action OnJoinLobbySuccess { get; set; }
         public Action OnJoinRoomSuccess { get; set; }
@@ -34,14 +31,14 @@ namespace Saitou.Online
 
         void Start()
         {
-            Connect("2.0");
+
         }
 
         /// <summary>
         /// 接続
         /// </summary>
         /// <param name="gameVersion">ゲームバージョン</param>
-        void Connect(string gameVersion)
+        public void Connect(string gameVersion)
         {
             if(PhotonNetwork.IsConnected == false)
             {
@@ -65,7 +62,7 @@ namespace Saitou.Online
         /// 部屋を作成し、入出
         /// </summary>
         /// <param name="_roomName"></param>
-        public void CreateOrJoinRoom()
+        public void CreateOrJoinRoom(string roomName)
         {
             RoomOptions roomOptions = new RoomOptions
             {
@@ -82,30 +79,8 @@ namespace Saitou.Online
             // 部屋を作成して入室する
             if (PhotonNetwork.InLobby)
             {
+                Debug.Log("入室");
                 PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, TypedLobby.Default);
-            }
-        }
-
-        /// <summary>
-        /// 名前指定の部屋に入室
-        /// </summary>
-        /// <param name="_roomName"></param>
-        public void JoinRoom()
-        {
-            if (PhotonNetwork.InLobby)
-            {
-                PhotonNetwork.JoinRoom(roomName);
-            }
-        }
-
-        /// <summary>
-        /// ランダムな部屋に入室
-        /// </summary>
-        public void JoinRandomRoom()
-        {
-            if (PhotonNetwork.InLobby)
-            {
-                PhotonNetwork.JoinRandomRoom();
             }
         }
 
@@ -118,6 +93,14 @@ namespace Saitou.Online
             JoinLobby();
         }
 
+        /// <summary>
+        /// ロビーに入ったとき
+        /// </summary>
+        public override void OnJoinedLobby()
+        {
+            Debug.Log("ロビー入室");
+            OnJoinLobbySuccess?.Invoke();
+        }
 
         /// <summary>
         /// 部屋の入室に失敗したとき(名前指定)
@@ -128,26 +111,6 @@ namespace Saitou.Online
         {
             Debug.Log("部屋への入室に失敗しました");
             OnJoinRoomFiled?.Invoke();
-        }
-
-        /// <summary>
-        /// 部屋の入室に失敗したとき(ランダム)
-        /// </summary>
-        /// <param name="returnCode"></param>
-        /// <param name="message"></param>
-        public override void OnJoinRandomFailed(short returnCode, string message)
-        {
-            Debug.Log("部屋への入室に失敗しました");
-            OnJoinRoomFiled?.Invoke();
-        }
-
-        /// <summary>
-        /// ロビーに入ったとき
-        /// </summary>
-        public override void OnJoinedLobby()
-        {
-            Debug.Log("ロビー入室");
-            OnJoinLobbySuccess?.Invoke();
         }
 
         /// <summary>

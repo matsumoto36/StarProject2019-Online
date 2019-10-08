@@ -17,15 +17,28 @@ namespace Saitou.Online
         OnlineConnect _connect;
         LobbyButtonController _lobbyButtonController;
 
-        public string RoomName;
+        string _roomName;
+        public string RoomName { get { return _roomName; } }
 
         void Start()
         {
             DontDestroyOnLoad(gameObject);
 
             _lobbyButtonController = FindObjectOfType<LobbyButtonController>();
-            _lobbyButtonController.OnCreateRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
-            _lobbyButtonController.OnInRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
+            
+            // 部屋を作成
+            _lobbyButtonController.OnCreateRoomButtonClick += () => 
+            {
+                _roomName = _lobbyButtonController.SetedLobbyName;
+                _connect.CreateOrJoinRoom(_roomName);
+                Debug.Log(_roomName);
+            };
+            // 部屋を作成
+            _lobbyButtonController.OnInRoomButtonClick += () => 
+            {
+                _roomName = _lobbyButtonController.SetedLobbyName;
+                _connect.CreateOrJoinRoom(_roomName);
+            };
 
             _lobbyButtonController.OnBackButtonClick += () => 
             {
@@ -57,7 +70,7 @@ namespace Saitou.Online
             
             if(PhotonNetwork.PlayerList.Length >= 2)
             {
-                PhotonNetwork.LoadLevel("BattleScene");
+                SceneChanger.Instance.MoveScene("BattleScene", 1.0f, 1.0f, SceneChangeType.StarBlackFade, true);
             }
             
         }

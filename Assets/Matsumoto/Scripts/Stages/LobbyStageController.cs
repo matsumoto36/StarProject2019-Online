@@ -54,7 +54,16 @@ public class LobbyStageController : MonoBehaviour, IStageController {
 		// BGMを鳴らす
 		AudioManager.FadeIn(1.0f, "vigilante");
 
-		GameStart();
+		ButtonController.OnCreateRoomButtonClick += () => {
+			GameStart();
+			ButtonController.IsActive = false;
+		};
+
+		ButtonController.OnInRoomButtonClick += () => {
+			GameStart();
+			ButtonController.IsActive = false;
+		};
+
 	}
 
 	public void GameStart() {
@@ -63,9 +72,9 @@ public class LobbyStageController : MonoBehaviour, IStageController {
 
 		State = GameState.Playing;
 
-		//OnGameStart?.Invoke(this);
+		OnGameStart?.Invoke(this);
 
-		//CanPause = true;
+		CanPause = true;
 	}
 
 	public void BackToSelectScene() {

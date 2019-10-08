@@ -23,6 +23,7 @@ namespace Saitou.Online
         public Action OnJoinRoomFiled { get; set; }
         public Action OnJoinLobbySuccess { get; set; }
         public Action OnJoinRoomSuccess { get; set; }
+        public Action OnDisconnect { get; set; }
 
         void Awake()
         {
@@ -40,11 +41,12 @@ namespace Saitou.Online
         /// <param name="gameVersion">ゲームバージョン</param>
         public void Connect(string gameVersion)
         {
-            if(PhotonNetwork.IsConnected == false)
-            {
+            Debug.Log("IsConnected" + PhotonNetwork.IsConnected);
+            //if(PhotonNetwork.IsConnected == false)
+            //{
                 PhotonNetwork.GameVersion = gameVersion;
                 PhotonNetwork.ConnectUsingSettings();
-            }
+            //}
         }
 
         /// <summary>
@@ -76,6 +78,8 @@ namespace Saitou.Online
                 IsOpen = isOpen
             };
 
+            Debug.Log("InLobby" + PhotonNetwork.InLobby);
+
             // 部屋を作成して入室する
             if (PhotonNetwork.InLobby)
             {
@@ -101,6 +105,7 @@ namespace Saitou.Online
             Debug.Log("ロビー入室");
             OnJoinLobbySuccess?.Invoke();
         }
+
 
         /// <summary>
         /// 部屋の入室に失敗したとき(名前指定)
@@ -131,7 +136,8 @@ namespace Saitou.Online
             {
                 Debug.Log("退出");
                 // 退室
-                PhotonNetwork.LeaveRoom();
+                PhotonNetwork.Disconnect();
+                OnDisconnect?.Invoke();
             }
         }
     }

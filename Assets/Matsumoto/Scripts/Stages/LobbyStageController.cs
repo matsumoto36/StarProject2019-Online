@@ -78,15 +78,6 @@ public class LobbyStageController : MonoBehaviour, IStageController {
 	}
 
 	public void BackToSelectScene() {
-
-		Debug.Log("return");
-
-		State = GameState.GameClear;
-
-		OnGameClear?.Invoke(this);
-		CanPause = false;
-
-		AudioManager.FadeOut(1.0f);
-		SceneChanger.Instance.MoveScene("StageSelect", 1.0f, 1.0f, SceneChangeType.BlackFade);
+        ButtonController.CallBackButtonClick();
 	}
 }

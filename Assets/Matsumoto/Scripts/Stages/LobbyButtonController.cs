@@ -50,10 +50,13 @@ public class LobbyButtonController : MonoBehaviour {
 			OnBackButtonClick?.Invoke();
 		});
 
-	}
+        RobbyNameField.Select();
+
+    }
 
 	private void Update() {
 		if(!IsActive) return;
+        if (RobbyNameField.isFocused) return;
 
 		if(Input.GetButtonDown("Attack")) {
 			switch(_selectionButton) {
@@ -78,4 +81,9 @@ public class LobbyButtonController : MonoBehaviour {
 		Cursor.position = Buttons[_selectionButton].transform.position;
 
 	}
+
+    public void CallBackButtonClick()
+    {
+        OnBackButtonClick?.Invoke();
+    }
 }

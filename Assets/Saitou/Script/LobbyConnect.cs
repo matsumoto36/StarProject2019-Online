@@ -27,8 +27,18 @@ namespace Saitou.Online
             _lobbyButtonController.OnCreateRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
             _lobbyButtonController.OnInRoomButtonClick += () => { _connect.CreateOrJoinRoom(RoomName); };
 
+            _lobbyButtonController.OnBackButtonClick += () => 
+            {
+                _connect.LeaveRoom();
+            };
+
             _connect = FindObjectOfType<OnlineConnect>();
             _connect.Connect("2.0");
+
+            _connect.OnDisconnect = () => 
+            {
+                Destroy(gameObject);
+            };
         }
 
         /// <summary>

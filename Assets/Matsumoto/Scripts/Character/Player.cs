@@ -659,6 +659,8 @@ namespace Matsumoto.Character {
 
 			if(!IsAttacking) return;
 
+            if (PhotonNetwork.InRoom && !PhotonNetwork.IsMasterClient) return;
+
 			var damageable = collision.gameObject.GetComponent<IDamageable>();
 			if(damageable == null) return;
 
@@ -703,7 +705,7 @@ namespace Matsumoto.Character {
 			AudioManager.PlaySE("Death", position: transform.position);
 
 			// 死亡通知
-			OnDeath?.Invoke(this);
+			if(!PhotonNetwork.InRoom || PhotonNetwork.IsMasterClient) OnDeath?.Invoke(this);
 		}
 	}
 }

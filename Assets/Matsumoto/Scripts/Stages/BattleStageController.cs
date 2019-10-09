@@ -8,8 +8,9 @@ using Matsumoto.Gimmick;
 using Matsumoto.Audio;
 using Matsumoto.Character;
 using Matsumoto;
+using Photon.Pun;
 
-public class BattleStageController : MonoBehaviour, IStageController {
+public class BattleStageController : MonoBehaviourPunCallbacks, IStageController {
 
 	public event Action<IStageController> OnGameStart;
 	public event Action<IStageController> OnGameClear;
@@ -29,6 +30,8 @@ public class BattleStageController : MonoBehaviour, IStageController {
 
 	private Player[] _players;
 	private bool[] _deathPlayers;
+
+    private PhotonView _view;
 
 	public bool CanPause {
 		get; set;
@@ -66,24 +69,8 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		for(int i = 0;i < _players.Length;i++) {
 			var playerID = i;
 			_players[playerID].OnDeath += (_) => {
-				Debug.Log("DeathPlayer " + playerID);
-				_deathPlayers[playerID] = true;
-				_players[playerID].IsFreeze = true;
-
-				var count = 0;
-				var leaveID = -1;
-				foreach(var item in _deathPlayers) {
-					if(!item) {
-						leaveID = count;
-					}
-					else {
-						count++;
-					}
-				}
-				if(count <= 1) {
-					StartCoroutine(Result(leaveID));
-				}
-			};
+                _view.RPC(nameof(Death),RpcTarget.All,playerID);
+            };
 		}
 
         var player = FindObjectsOfType<Saitou.Online.OnlineState>();
@@ -99,6 +86,7 @@ public class BattleStageController : MonoBehaviour, IStageController {
         }
 
        _onlineManager = FindObjectOfType<Saitou.Online.OnlineManager>();
+        _view = GetComponent<PhotonView>();
 	}
 
 	// Use this for initialization
@@ -119,6 +107,37 @@ public class BattleStageController : MonoBehaviour, IStageController {
 		//}
 
 	}
+
+    [PunRPC]
+    void Death(int playerID)
+    {
+        Debug.Log("DeathPlayer " + playerID);
+        _deathPlayers[playerID] = true;
+        _players[playerID].IsFreeze = true;
+
+        if(!PhotonNetwork.IsMasterClient)
+        {
+            _players[playerID].ApplyDamage(_players[playerID].gameObject, DamageType.Enemy);
+        }
+
+        var count = 0;
+        var leaveID = -1;
+        foreach (var item in _deathPlayers)
+        {
+            if (!item)
+            {
+                leaveID = count;
+            }
+            else
+            {
+                count++;
+            }
+        }
+        if (count <= 1)
+        {
+            StartCoroutine(Result(leaveID));
+        }
+    }
 
 	private void CreateStage(string stagePath) {
 

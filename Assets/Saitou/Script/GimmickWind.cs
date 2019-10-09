@@ -82,7 +82,7 @@ namespace StarProject2019.Saitou
 
             int layerMask;
 
-            if (isWallIgnore) layerMask = 1 << 10;
+            if (isWallIgnore) layerMask = ~(1 << 10);
             else layerMask = 1 << 10 | 1 << 8 | 1 << 9;
 
             var hits = Physics2D.BoxCastAll(ray.origin,transform.localScale,0.0f, ray.direction,dis,layerMask);

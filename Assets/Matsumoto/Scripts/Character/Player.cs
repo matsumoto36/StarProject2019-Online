@@ -125,6 +125,10 @@ namespace Matsumoto.Character {
 			}
 		}
 
+		public bool IsDeath {
+			get; private set;
+		}
+
 
 		public bool IsAttacking {
 			get; private set;
@@ -678,7 +682,9 @@ namespace Matsumoto.Character {
 
 			AudioManager.PlaySE("AttackHit_3", position: transform.position);
 
-			StartCoroutine(HitStop(0.1f));
+			if(hit) {
+				StartCoroutine(HitStop(0.1f));
+			}
 		}
 
 		private void OnDrawGizmos() {
@@ -703,6 +709,8 @@ namespace Matsumoto.Character {
 			Destroy(p, 5.0f);
 
 			AudioManager.PlaySE("Death", position: transform.position);
+
+			IsDeath = true;
 
 			// 死亡通知
 			if(!PhotonNetwork.InRoom || PhotonNetwork.IsMasterClient) OnDeath?.Invoke(this);

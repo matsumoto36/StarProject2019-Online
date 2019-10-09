@@ -118,6 +118,27 @@ public class StageSelectController : MonoBehaviour {
 			SceneChanger.Instance.MoveScene("StageSelect", 0.2f, 0.2f, SceneChangeType.BlackFade);
 		}
 
+		if(Input.GetKeyDown(KeyCode.L) && !_isSceneMoving) {
+			_isSceneMoving = true;
+			_lastSelectedStageIndex = GetStageIndex(TitleNode);
+			GameData.Instance.DeleteDataAll();
+
+			// 進行度設定
+			var stages = Resources.LoadAll("Stages/")
+				.Select(item => item.name)
+				.ToList();
+
+			var clearedStages = new HashSet<string>();
+			foreach(var item in stages) {
+				clearedStages.Add(item);
+			}
+
+			GameData.Instance.SetData(StageProgressKey, clearedStages);
+
+			GameData.Instance.Save();
+			SceneChanger.Instance.MoveScene("StageSelect", 0.2f, 0.2f, SceneChangeType.BlackFade);
+		}
+
 		if(p == Position) {
 			// ノードに到着した
 			_currentSelectedStage = _targetStage;

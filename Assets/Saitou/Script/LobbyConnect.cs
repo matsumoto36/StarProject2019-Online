@@ -30,6 +30,7 @@ namespace Saitou.Online
             _lobbyButtonController.OnCreateRoomButtonClick += () => 
             {
                 _roomName = _lobbyButtonController.SetedLobbyName;
+				if(_roomName == "") _roomName = "random";
                 _connect.CreateOrJoinRoom(_roomName);
                 Debug.Log(_roomName);
             };
@@ -37,6 +38,7 @@ namespace Saitou.Online
             _lobbyButtonController.OnInRoomButtonClick += () => 
             {
                 _roomName = _lobbyButtonController.SetedLobbyName;
+				if(_roomName == "") _roomName = "random";
                 _connect.CreateOrJoinRoom(_roomName);
             };
 

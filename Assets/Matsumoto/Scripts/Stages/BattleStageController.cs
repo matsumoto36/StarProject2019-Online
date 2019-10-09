@@ -106,6 +106,10 @@ public class BattleStageController : MonoBehaviourPunCallbacks, IStageController
 		//	PauseMenuCanvas.gameObject.SetActive(!PauseMenuCanvas.gameObject.activeSelf);
 		//}
 
+		if(Input.GetKeyDown(KeyCode.P)) {
+			MoveLobby();
+		}
+
 	}
 
     [PunRPC]
@@ -227,12 +231,8 @@ public class BattleStageController : MonoBehaviourPunCallbacks, IStageController
 			yield return new WaitForSeconds(5.0f);
 			points = new int[_players.Length];
 			GameData.Instance.SetData("BattlePoints", points);
+			MoveLobby();
 
-			// 退出
-			FindObjectOfType<Saitou.Online.OnlineConnect>()
-				.LeaveRoom();
-
-			SceneChanger.Instance.MoveScene("LobbyScene", 0.2f, 0.2f, SceneChangeType.BlackFade);
 			yield break;
 		}
 
@@ -243,5 +243,13 @@ public class BattleStageController : MonoBehaviourPunCallbacks, IStageController
 	[ContextMenu("ShowScore")]
 	public void ShowResult() {
 		Viewer.ShowScore(_players, new int[] { 1, 2 }, 3, 0);
+	}
+
+	private void MoveLobby() {
+		// 退出
+		FindObjectOfType<Saitou.Online.OnlineConnect>()
+			.LeaveRoom();
+
+		SceneChanger.Instance.MoveScene("LobbyScene", 0.2f, 0.2f, SceneChangeType.BlackFade);
 	}
 }

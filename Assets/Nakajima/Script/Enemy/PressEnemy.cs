@@ -100,9 +100,10 @@ public class PressEnemy : EnemyBase, IEnemy
     /// <summary>
     /// ダメージを受けた際の処理
     /// </summary>
-    public void ApplyDamage(GameObject damager, DamageType type, float power = 1.0f)
+    public bool ApplyDamage(GameObject damager, DamageType type, float power = 1.0f)
     {
         Destroy(gameObject);
+		return true;
     }
 
     /// <summary>

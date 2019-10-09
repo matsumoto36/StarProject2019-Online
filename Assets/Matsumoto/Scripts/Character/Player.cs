@@ -670,10 +670,10 @@ namespace Matsumoto.Character {
 
 			Destroy(g.gameObject, 5);
 
-			damageable.ApplyDamage(gameObject, DamageType.Enemy);
+			var hit = damageable.ApplyDamage(gameObject, DamageType.Enemy);
 
 			// 敵にあたったら回復
-			_canAttack = true;
+			_canAttack = hit;
 			_attackWait = 0;
 
 			AudioManager.PlaySE("AttackHit_3", position: transform.position);
@@ -688,9 +688,9 @@ namespace Matsumoto.Character {
 			Gizmos.DrawSphere(transform.position, 0.5f);
 		}
 
-		public void ApplyDamage(GameObject damager, DamageType type, float power = 1.0f) {
+		public bool ApplyDamage(GameObject damager, DamageType type, float power = 1.0f) {
 
-			if(type == DamageType.Enemy && IsAttacking) return;
+			if(type == DamageType.Enemy && IsAttacking) return false;
 
 			// 死亡演出
 			IsRenderer = false;
@@ -706,6 +706,8 @@ namespace Matsumoto.Character {
 
 			// 死亡通知
 			if(!PhotonNetwork.InRoom || PhotonNetwork.IsMasterClient) OnDeath?.Invoke(this);
+
+			return true;
 		}
 	}
 }

@@ -80,7 +80,9 @@ public class BattleStageController : MonoBehaviourPunCallbacks, IStageController
         {
             if (OnlineData.PlayerID == (int)player[i]._PlayerList)
             {
-                _playerCamera.TargetPlayer = player[i].GetComponent<Player>();
+                Player p = player[i].GetComponent<Player>();
+                _playerCamera.TargetPlayer = p;
+                p.GetComponent<AudioListener>().enabled = true;
                 break;
             }
         }

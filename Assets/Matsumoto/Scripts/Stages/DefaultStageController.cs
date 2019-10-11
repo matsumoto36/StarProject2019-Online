@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Tilemaps;
+using UnityEngine.UI;
 using System;
 using UnityEngine.SceneManagement;
 using Matsumoto.Gimmick;
@@ -21,10 +21,16 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 
 	public const string StageFollowerDataTarget = "_FollowerData";
 	public const string HalfwayPointKey = "HalfWay";
+	public const string DeathCountKey = "DeathCount";
+	public const string IsActiveStatusKey = "StatusCanvas";
+	public const string TimerKey = "Timer";
 
 	public event Action<IStageController> OnGameStart;
 	public event Action<IStageController> OnGameClear;
 	public event Action<IStageController> OnGameOver;
+
+	public Canvas StatusCanvas;
+	public Text StatusText;
 
 	public PlayerFollower PlayerFollowerPrefab;
 	public PauseMenu PauseMenuCanvas;
@@ -34,6 +40,10 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 	public bool IsReturnToSelect = true;
 
 	public string StagePath = "TestStage";
+
+	private float _timer;
+	private int _deathCount;
+	private bool _isStatusActive;
 	private string _followerDataKey;
 	private List<GimmickChip> _gimmicks = new List<GimmickChip>();
 
@@ -81,8 +91,10 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 		if (GameData.Instance.GetData(HalfwayPointKey, ref _halfPointData)) {
 
 			 delayAct = () => {
-				player.transform.position = _halfPointData.PlayerPosition;
-				FindObjectOfType<PlayerCamera>().SetTarget(player);
+				 if(_halfPointData.IsHalfPointActive) {
+					 player.transform.position = _halfPointData.PlayerPosition;
+					 FindObjectOfType<PlayerCamera>().SetTarget(player);
+				 }
 			};
 
 			// 生成
@@ -94,6 +106,12 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 			// データを統合して取得したことにする
 			_followerData.FindedIndexList.AddRange(_halfPointData.FollowerData.FindedIndexList);
 		}
+
+		// DeathCount
+		GameData.Instance.GetData(TimerKey, ref _timer);
+		GameData.Instance.GetData(DeathCountKey, ref _deathCount);
+		GameData.Instance.GetData(IsActiveStatusKey, ref _isStatusActive);
+		StatusCanvas.gameObject.SetActive(_isStatusActive);
 
 		// ギミック
 		_gimmicks = FindObjectsOfType<GimmickChip>().ToList();
@@ -136,6 +154,30 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 			PauseMenuCanvas.gameObject.SetActive(!PauseMenuCanvas.gameObject.activeSelf);
 		}
 
+		if(!PauseSystem.Instance.IsPause && State == GameState.Playing) {
+			_timer += Time.deltaTime;
+		}
+
+		if(Input.GetKeyDown(KeyCode.O)) {
+			_isStatusActive = !_isStatusActive;
+			StatusCanvas.gameObject.SetActive(_isStatusActive);
+			GameData.Instance.SetData(IsActiveStatusKey, _isStatusActive);
+		}
+
+		if(_isStatusActive) {
+			var minite = (int)(_timer / 60);
+			var sec = (int)(_timer - minite * 60);
+			var milli = (_timer - (int)(_timer)) * 100;
+
+			StatusText.text =
+				$"Time: {minite.ToString("00")}:{sec.ToString("00")}:{milli.ToString("00")}\r\n" +
+				$"Death: {_deathCount}";
+
+			if(State == GameState.GameClear) {
+				StatusText.color = Color.white;
+			}
+		}
+
 	}
 
 	private void CreateStage(string stagePath) {
@@ -163,6 +205,8 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 
 		// 中間データを削除
 		GameData.Instance.DeleteData(HalfwayPointKey);
+		GameData.Instance.DeleteData(TimerKey);
+		GameData.Instance.DeleteData(DeathCountKey);
 
 		// フォロワーとクリアデータを保存
 		GameData.Instance.SetData(_followerDataKey, _followerData);
@@ -192,6 +236,10 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 		OnGameOver?.Invoke(this);
 		CanPause = false;
 
+		_deathCount++;
+		GameData.Instance.SetData(DeathCountKey, _deathCount);
+		GameData.Instance.SetData(TimerKey, _timer);
+
 		StartCoroutine(GameOverWait());
 	}
 
@@ -212,6 +260,7 @@ public class DefaultStageController : MonoBehaviour, IStageController {
 
 	public void SetHalfPoint(Vector3 position) {
 		_halfPointData.PlayerPosition = position;
+		_halfPointData.IsHalfPointActive = true;
 		GameData.Instance.SetData(HalfwayPointKey, _halfPointData);
 	}
 }
@@ -234,6 +283,8 @@ namespace Matsumoto {
 		}
 
 		public FollowerFindData FollowerData = new FollowerFindData();
+
+		public bool IsHalfPointActive;
 	}
 
 }

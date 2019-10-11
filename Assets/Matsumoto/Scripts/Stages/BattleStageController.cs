@@ -230,20 +230,20 @@ public class BattleStageController : MonoBehaviourPunCallbacks, IStageController
 		yield return Viewer.ShowScore(_players, points, 3, winPlayerId);
 		yield return new WaitForSeconds(1.0f);
 
-		//points[winPlayerId]++;
+		points[winPlayerId]++;
 
 		var sceneName = SceneManager.GetActiveScene().name;
 
-		//if(points[winPlayerId] >= 3) {
-		//	// 勝利
-		//	Viewer.ShowWinner(_players, winPlayerId);
-		//	yield return new WaitForSeconds(5.0f);
-		//	points = new int[_players.Length];
-		//	GameData.Instance.SetData("BattlePoints", points);
-		//	MoveLobby();
+		if(points[winPlayerId] >= 3) {
+			// 勝利
+			Viewer.ShowWinner(_players, winPlayerId);
+			yield return new WaitForSeconds(5.0f);
+			points = new int[_players.Length];
+			GameData.Instance.SetData("BattlePoints", points);
+			MoveLobby();
 
-		//	yield break;
-		//}
+			yield break;
+		}
 
 		GameData.Instance.SetData("BattlePoints", points);
 		SceneChanger.Instance.MoveScene(sceneName, 0.2f, 0.2f, SceneChangeType.BlackFade, true);
